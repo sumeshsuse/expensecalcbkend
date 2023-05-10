@@ -1,17 +1,14 @@
 package com.expenditure.calculator.model;
 
-import jakarta.persistence.Entity;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.stereotype.Component;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
 
 @Setter
 @ToString
 @Entity
-@Component
+@Table
 public class Login {
 
     @Id
