@@ -2,30 +2,48 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-- script: |
-    # Install Maven Wrapper
-    curl -L https://github.com/takari/maven-wrapper/archive/maven-wrapper-0.5.6.tar.gz | tar -xz
-    export PATH=$PWD/maven-wrapper-maven-wrapper-0.5.6:$PATH
+- task: UseJavaVersion@0
+  inputs:
+    version: '17' # Set the desired Java version
+    jdkArchitectureOption: 'x64' # You can change this based on your requirements
 
-    # Run Maven using the Wrapper
-    ./mvnw -N io.takari:maven:0.7.6:wrapper -Dmaven=3.8.4
+- task: UseJavaTool@0
+  inputs:
+    versionSpec: '17' # Set the desired Java version
+    tool: 'JavaTool' # The tool you want to use
+    package: 'adopt@1.17' # Package and version of the JDK you want to install
+    cleanCache: true # Set this to true to clean the cache
 
-    # Run your Maven build
-    ./mvnw clean install
-  displayName: 'Install and Use Maven Wrapper'
-
-- script: |
-    echo "##vso[task.setvariable variable=JAVA_HOME]/usr/lib/jvm/java-17-openjdk-amd64" # Replace with the path to Java 17
-    echo "##vso[task.setvariable variable=PATH]$(JAVA_HOME)/bin:$PATH"
+- script: 'echo "##vso[task.setvariable variable=JAVA_HOME]$(JavaTool.JavaTool_17_adopt_1.17.x64)"'
   displayName: 'Set JAVA_HOME'
+
+- script: 'echo "##vso[task.setvariable variable=PATH]$(JAVA_HOME)/bin:$PATH"'
+  displayName: 'Add Java to PATH'
+
+- script: |
+    # Download Apache Maven
+    curl -o apache-maven-3.8.4-bin.tar.gz https://downloads.apache.org/maven/maven-3.8.4-bin.tar.gz
+
+    # Extract Maven
+    tar xvzf apache-maven-3.8.4-bin.tar.gz
+
+    # Set MAVEN_HOME
+    echo "##vso[task.setvariable variable=MAVEN_HOME]$(Agent.ToolsDirectory)/apache-maven-3.8.4"
+
+    # Add Maven to PATH
+    echo "##vso[task.setvariable variable=PATH]$(MAVEN_HOME)/bin:$PATH"
+  displayName: 'Install Maven'
+
+- script: 'mvn -version'
+  displayName: 'Check Maven Version'
 
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
-    goals: 'install'
+    goals: 'clean install'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
