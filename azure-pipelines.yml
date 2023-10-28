@@ -5,9 +5,10 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: UseJavaVersion@0
-  inputs:
-    version: '17' # Set this to the desired Java version
+- script: |
+    echo "##vso[task.setvariable variable=JAVA_HOME]$(Agent.ToolsDirectory)/jdk/17.0.x64" # Set the desired Java version
+    echo "##vso[task.setvariable variable=PATH]$(Agent.ToolsDirectory)/jdk/17.0.x64/bin:$PATH"
+  displayName: 'Set Java Version'
 
 - task: Maven@3
   inputs:
