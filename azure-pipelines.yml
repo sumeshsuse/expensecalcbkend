@@ -34,3 +34,16 @@ steps:
     goals: 'clean install'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
+
+- task: Docker@0
+  displayName: 'Build an image'
+  inputs:
+    azureSubscription: 'Azure subscription 1 (5e8944ac-d1ba-4b86-8315-eedd04e037d3)'
+    azureContainerRegistry: '{"loginServer":"backecontainerregistry.azurecr.io", "id" : "/subscriptions/5e8944ac-d1ba-4b86-8315-eedd04e037d3/resourceGroups/DemoRG/providers/Microsoft.ContainerRegistry/registries/BackeContainerRegistry"}'
+
+- task: Docker@0
+  displayName: 'Push an image'
+  inputs:
+    azureSubscription: 'Azure subscription 1 (5e8944ac-d1ba-4b86-8315-eedd04e037d3)'
+    azureContainerRegistry: '{"loginServer":"backecontainerregistry.azurecr.io", "id" : "/subscriptions/5e8944ac-d1ba-4b86-8315-eedd04e037d3/resourceGroups/DemoRG/providers/Microsoft.ContainerRegistry/registries/BackeContainerRegistry"}'
+    action: 'Push an image'
